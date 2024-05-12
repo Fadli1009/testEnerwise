@@ -29,11 +29,19 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email
-        ]);
-        return response()->json(['message' => 'success'], 200);
+        try {
+            $request->validate([
+                'name' => 'required',
+                'email' => 'required'
+            ]);
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email
+            ]);
+            return response()->json(['message' => 'success'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => $th], 200);
+        }
     }
 
     /**
@@ -58,6 +66,10 @@ class UserController extends Controller
     public function update(Request $request, string $id)
     {
         try {
+            $request->validate([
+                'name' => 'required',
+                'email' => 'required'
+            ]);
             $data = User::find($id);
             $update = $data->update([
                 'name' => $request->name,
